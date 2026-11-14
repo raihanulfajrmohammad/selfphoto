@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haru Studio • Bright Minimalist Self Photo Booth</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- QRCode JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        studio: {
+                            50: '#fafafa',
+                            100: '#f4f4f5',
+                            200: '#e4e4e7',
+                            800: '#27272a',
+                            900: '#18181b',
+                            950: '#09090b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Flash Screen Animation */
+        .flash-animation {
+            animation: studioFlash 0.5s ease-out;
+        }
+        @keyframes studioFlash {
+            0% { opacity: 0; }
+            50% { opacity: 1; background-color: #ffffff; }
+            100% { opacity: 0; }
+        }
+
+        /* Subtle Bright Studio Grid */
+        .bg-studio-grid {
+            background-size: 24px 24px;
+            background-image: 
+                linear-gradient(to right, rgba(0, 0, 0, 0.035) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.035) 1px, transparent 1px);
+        }
+
+        /* Custom Minimal Light Scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fafafa;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d4d4d8;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-zinc-50 text-zinc-900 font-sans min-h-screen flex flex-col antialiased selection:bg-zinc-900 selection:text-white bg-studio-grid">
+
+    <!-- Minimal Bright Header Navigation -->
+    <header class="border-b border-zinc-200/80 bg-white/85 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-2.5 cursor-pointer" onclick="resetApp()">
+                <div class="w-8 h-8 rounded-lg bg-zinc-900 text-white flex items-center justify-center font-display font-extrabold text-sm tracking-tight shadow-xs">
+                    H
+                </div>
+                <div>
+                    <span class="font-display font-bold text-base tracking-tight text-zinc-900">haru<span class="text-zinc-400 font-normal">studio</span></span>
+                    <span class="text-[10px] text-zinc-400 font-mono block -mt-1 uppercase tracking-widest">Self Photo Booth</span>
+                </div>
+            </div>
+
+            <!-- Sleek Steps Bar -->
+            <nav id="step-nav" class="hidden sm:flex items-center gap-6 text-xs font-medium text-zinc-400">
+                <div id="step-btn-1" class="flex items-center gap-2 text-zinc-900 font-semibold">
+                    <span class="w-5 h-5 rounded-full bg-zinc-900 text-white flex items-center justify-center text-[10px] font-bold">1</span>
+                    <span>Paket & QRIS</span>
+                </div>
+                <div id="step-btn-2" class="flex items-center gap-2 text-zinc-400">
+                    <span class="w-5 h-5 rounded-full bg-zinc-200/80 text-zinc-500 flex items-center justify-center text-[10px] font-bold">2</span>
+                    <span>Frame Setup</span>
+                </div>
+                <div id="step-btn-3" class="flex items-center gap-2 text-zinc-400">
+                    <span class="w-5 h-5 rounded-full bg-zinc-200/80 text-zinc-500 flex items-center justify-center text-[10px] font-bold">3</span>
+                    <span>Foto Studio</span>
+                </div>
+                <div id="step-btn-4" class="flex items-center gap-2 text-zinc-400">
+                    <span class="w-5 h-5 rounded-full bg-zinc-200/80 text-zinc-500 flex items-center justify-center text-[10px] font-bold">4</span>
+                    <span>Hasil & Simpan</span>
+                </div>
+            </nav>
+
+            <button onclick="resetApp()" class="text-xs text-zinc-600 hover:text-zinc-900 transition flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 shadow-2xs">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                <span>Reset</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-5xl w-full mx-auto p-4 md:p-8 flex flex-col justify-center">
+
+        <!-- ================= STEP 1: PAKET FOTO & QRIS PAYMENT ================= -->
+        <section id="screen-payment" class="space-y-8 animate-fade-in">
+            <div class="text-center max-w-lg mx-auto space-y-2">
+                <span class="text-xs font-mono font-semibold tracking-widest text-zinc-500 uppercase">STEP 01 / PAYMENT KIOSK</span>
+                <h2 class="text-3xl font-display font-bold text-zinc-900 tracking-tight">Pilih Frame & Scan QRIS</h2>
+                <p class="text-zinc-500 text-xs leading-relaxed">
+                    Pilih layout foto favoritmu, lakukan pembayaran cepat menggunakan QRIS untuk membuka bilik foto studio.
+                </p>
+            </div>
+
+            <!-- Package Selection Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl mx-auto">
+                
+                <!-- Package 1: Classic 4-Cut Strip -->
+                <div onclick="selectPackage('strip-4', 25000, 'Classic 4-Cut Strip', 4)" class="group cursor-pointer bg-white hover:bg-zinc-50/70 border border-zinc-200 hover:border-zinc-400 rounded-2xl p-6 transition-all duration-200 flex flex-col justify-between shadow-sm hover:shadow-md">
+                    <div class="space-y-4">
+                        <div class="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200/80 flex items-center justify-center text-zinc-800">
+                            <i data-lucide="columns-2" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-zinc-900 text-base">Classic 4-Cut Strip</h3>
+                            <p class="text-xs text-zinc-500 mt-1">Format strip vertikal 4 pose memanjang bergaya photo booth klasik.</p>
+                        </div>
+                        <div class="pt-3 border-t border-zinc-100">
+                            <span class="text-[11px] text-zinc-400 block">Harga Sesi</span>
+                            <span class="text-2xl font-display font-bold text-zinc-900">Rp 25.000</span>
+                        </div>
+                    </div>
+                    <button class="mt-6 w-full py-2.5 px-4 rounded-xl bg-zinc-100 group-hover:bg-zinc-900 group-hover:text-white font-semibold text-xs text-zinc-800 transition border border-zinc-200 group-hover:border-zinc-900">
+                        Pilih Paket Strip
+                    </button>
+                </div>
+
+                <!-- Package 2: 2x2 Grid Photocard (Best Seller) -->
+                <div onclick="selectPackage('grid-4', 35000, '2x2 Grid Photocard', 4)" class="group cursor-pointer bg-white hover:bg-zinc-50/70 border-2 border-zinc-900 rounded-2xl p-6 transition-all duration-200 flex flex-col justify-between relative shadow-lg">
+                    <div class="absolute -top-3 right-4 px-3 py-0.5 rounded-full bg-zinc-900 text-white text-[10px] font-bold tracking-wider uppercase shadow-xs">
+                        POPULAR
+                    </div>
+                    <div class="space-y-4">
+                        <div class="w-10 h-10 rounded-xl bg-zinc-900 text-white flex items-center justify-center">
+                            <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-zinc-900 text-base">2x2 Grid Photocard</h3>
+                            <p class="text-xs text-zinc-500 mt-1">Format grid 4 foto persegi serbaguna, sempurna untuk cetak & medsos.</p>
+                        </div>
+                        <div class="pt-3 border-t border-zinc-100">
+                            <span class="text-[11px] text-zinc-400 block">Harga Sesi</span>
+                            <span class="text-2xl font-display font-bold text-zinc-900">Rp 35.000</span>
+                        </div>
+                    </div>
+                    <button class="mt-6 w-full py-2.5 px-4 rounded-xl bg-zinc-900 text-white font-bold text-xs hover:bg-zinc-800 transition shadow-xs">
+                        Pilih Paket Grid
+                    </button>
+                </div>
+
+                <!-- Package 3: Deluxe 6-Cut Studio -->
+                <div onclick="selectPackage('strip-6', 45000, 'Deluxe 6-Cut Studio', 6)" class="group cursor-pointer bg-white hover:bg-zinc-50/70 border border-zinc-200 hover:border-zinc-400 rounded-2xl p-6 transition-all duration-200 flex flex-col justify-between shadow-sm hover:shadow-md">
+                    <div class="space-y-4">
+                        <div class="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200/80 flex items-center justify-center text-zinc-800">
+                            <i data-lucide="gallery-vertical-end" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-zinc-900 text-base">Deluxe 6-Cut Studio</h3>
+                            <p class="text-xs text-zinc-500 mt-1">6 pose foto lengkap, sangat cocok untuk momen foto grup bersama teman.</p>
+                        </div>
+                        <div class="pt-3 border-t border-zinc-100">
+                            <span class="text-[11px] text-zinc-400 block">Harga Sesi</span>
+                            <span class="text-2xl font-display font-bold text-zinc-900">Rp 45.000</span>
+                        </div>
+                    </div>
+                    <button class="mt-6 w-full py-2.5 px-4 rounded-xl bg-zinc-100 group-hover:bg-zinc-900 group-hover:text-white font-semibold text-xs text-zinc-800 transition border border-zinc-200 group-hover:border-zinc-900">
+                        Pilih Paket 6-Cut
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- QRIS PAYMENT MODAL -->
+        <div id="qris-modal" class="fixed inset-0 bg-zinc-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+            <div class="bg-white border border-zinc-200 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative space-y-5">
+                
+                <button onclick="closeQrisModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-zinc-900 p-1 rounded-lg transition">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+
+                <!-- Header Modal -->
+                <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-red-600 text-white font-extrabold text-[10px] px-2 py-0.5 rounded font-mono tracking-wider">QRIS</span>
+                        <span class="text-xs font-semibold text-zinc-700">Pembayaran Kiosk Studio</span>
+                    </div>
+                </div>
+
+                <div class="text-center space-y-4">
+                    <div>
+                        <span class="text-xs text-zinc-400">Total Pembayaran:</span>
+                        <div id="selected-pkg-name" class="text-xs font-semibold text-zinc-600 mt-0.5">Classic 4-Cut Strip</div>
+                        <div id="selected-pkg-price" class="text-2xl font-display font-bold text-zinc-900 mt-1">Rp 25.000</div>
+                    </div>
+
+                    <!-- QR Display Box -->
+                    <div class="bg-zinc-50 p-4 rounded-xl inline-block border border-zinc-200 shadow-xs">
+                        <div id="qrcode-canvas" class="flex justify-center items-center bg-white p-2 rounded-lg"></div>
+                        <span class="mt-2 text-[9px] font-mono text-zinc-500 block uppercase tracking-wider">NMID: ID1094829381920</span>
+                    </div>
+
+                    <!-- Payment Timer Box -->
+                    <div class="bg-zinc-50 rounded-lg p-2.5 border border-zinc-200 flex items-center justify-between text-xs">
+                        <span class="text-zinc-500">Batas Waktu Transaksi:</span>
+                        <span id="payment-timer" class="font-mono font-bold text-amber-600">04:59</span>
+                    </div>
+
+                    <!-- Simulator Payment Button -->
+                    <button onclick="simulatePaymentSuccess()" class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-500 font-bold text-xs text-white rounded-xl shadow-md flex items-center justify-center gap-2 transition active:scale-95">
+                        <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                        Simulasi Bayar Berhasil (Klik Selesai)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= STEP 2: FRAME & SETUP ================= -->
+        <section id="screen-frame" class="hidden space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-zinc-200 pb-4">
+                <div>
+                    <span class="text-xs font-mono font-semibold text-zinc-500 tracking-wider uppercase">STEP 02 / FRAME SETUP</span>
+                    <h2 class="text-2xl font-display font-bold text-zinc-900">Kustomisasi Frame Foto</h2>
+                </div>
+                <button onclick="goToCameraScreen()" class="w-full sm:w-auto px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition shadow-sm">
+                    Lanjut ke Kamera Studio <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- Customize Options -->
+                <div class="lg:col-span-5 space-y-5 bg-white border border-zinc-200 p-5 rounded-2xl shadow-sm">
+                    
+                    <!-- 1. Color Swatches -->
+                    <div>
+                        <label class="text-xs font-semibold text-zinc-700 block mb-2.5 uppercase tracking-wider text-[11px]">
+                            Warna Latar Frame
+                        </label>
+                        <div class="grid grid-cols-4 gap-2.5" id="color-picker-container">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- 2. Text Footer Stamp -->
+                    <div>
+                        <label class="text-xs font-semibold text-zinc-700 block mb-1.5 uppercase tracking-wider text-[11px]">
+                            Teks Kustom (Footer Frame)
+                        </label>
+                        <input type="text" id="frame-text-input" value="HARU STUDIO • 2026" oninput="updateFramePreview()" class="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:outline-none focus:border-zinc-900 font-mono">
+                    </div>
+
+                    <!-- 3. Photo Filter Preset -->
+                    <div>
+                        <label class="text-xs font-semibold text-zinc-700 block mb-2 uppercase tracking-wider text-[11px]">
+                            Filter Kamera Preset
+                        </label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="setFilter('none', this)" class="filter-btn active px-3 py-2 text-xs rounded-lg border border-zinc-900 bg-zinc-900 text-white font-semibold transition">Natural</button>
+                            <button onclick="setFilter('soft', this)" class="filter-btn px-3 py-2 text-xs rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-600 font-medium transition">Soft Natural</button>
+                            <button onclick="setFilter('bw', this)" class="filter-btn px-3 py-2 text-xs rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-600 font-medium transition">Vintage Mono</button>
+                            <button onclick="setFilter('vintage', this)" class="filter-btn px-3 py-2 text-xs rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-600 font-medium transition">Warm Film</button>
+                            <button onclick="setFilter('cool', this)" class="filter-btn px-3 py-2 text-xs rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-600 font-medium transition">Cool Slate</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Frame Mockup Display -->
+                <div class="lg:col-span-7 flex flex-col items-center justify-center space-y-2.5">
+                    <span class="text-[11px] font-mono text-zinc-400 uppercase tracking-wider">Pratinjau Layout Frame</span>
+                    
+                    <div id="frame-mockup-wrapper" class="p-4 rounded-2xl bg-white border border-zinc-200 shadow-lg w-full max-w-[280px]">
+                        
+                        <div id="mockup-frame" class="p-4 rounded-xl bg-white space-y-2 border border-zinc-200 shadow-xs transition-all">
+                            <div id="mockup-slots-container" class="space-y-2">
+                                <!-- Slots populated by JS -->
+                            </div>
+                            
+                            <div id="mockup-footer-divider" class="pt-3 border-t border-zinc-200 text-center space-y-0.5">
+                                <div id="mockup-footer-text" class="font-mono text-[10px] tracking-widest uppercase font-semibold text-zinc-900">
+                                    HARU STUDIO • 2026
+                                </div>
+                                <div id="mockup-subtitle-text" class="text-[9px] font-mono text-zinc-400">
+                                    ★ SELF PHOTOBOOTH ★
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= STEP 3: STUDIO CAMERA ================= -->
+        <section id="screen-camera" class="hidden space-y-5">
+            <!-- Info Bar -->
+            <div class="flex justify-between items-center bg-white px-4 py-3 rounded-xl border border-zinc-200 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <span id="shooting-counter" class="w-8 h-8 rounded-lg bg-zinc-900 text-white flex items-center justify-center font-display font-bold text-xs">1/4</span>
+                    <div>
+                        <h3 class="text-xs font-semibold text-zinc-900">Live Viewfinder Studio</h3>
+                        <p id="pose-prompt" class="text-xs text-zinc-500">💡 Pose #1: Senyum manis & Peace Sign ✌️</p>
+                    </div>
+                </div>
+                
+                <button onclick="toggleMirror()" class="px-3 py-1.5 rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-xs font-medium text-zinc-700 flex items-center gap-1.5 transition">
+                    <i data-lucide="flip-horizontal" class="w-3.5 h-3.5"></i> Mirror Flip
+                </button>
+            </div>
+
+            <!-- Main Viewfinder Display -->
+            <div class="relative max-w-3xl mx-auto rounded-2xl overflow-hidden bg-zinc-950 border border-zinc-200 shadow-xl aspect-[4/3] flex items-center justify-center">
+                <video id="webcam-video" autoplay playsinline class="w-full h-full object-cover transform -scale-x-100"></video>
+                <canvas id="capture-canvas" class="hidden"></canvas>
+
+                <!-- Grid Overlay -->
+                <div class="absolute inset-0 border border-white/10 pointer-events-none grid grid-cols-3 grid-rows-3">
+                    <div class="border-r border-b border-white/10"></div>
+                    <div class="border-r border-b border-white/10"></div>
+                    <div class="border-b border-white/10"></div>
+                    <div class="border-r border-b border-white/10"></div>
+                    <div class="border-r border-b border-white/10"></div>
+                    <div class="border-b border-white/10"></div>
+                    <div class="border-r border-white/10"></div>
+                    <div class="border-r border-white/10"></div>
+                    <div></div>
+                </div>
+
+                <!-- Flash Overlay -->
+                <div id="flash-overlay" class="absolute inset-0 bg-white opacity-0 pointer-events-none z-30"></div>
+
+                <!-- Countdown Overlay -->
+                <div id="countdown-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-zinc-900/40 backdrop-blur-xs z-20 hidden">
+                    <span id="countdown-number" class="text-8xl font-display font-extrabold text-white font-mono drop-shadow-md">3</span>
+                    <span class="text-xs font-semibold tracking-widest text-zinc-900 bg-white/95 px-4 py-1.5 rounded-full mt-2 shadow-sm uppercase">
+                        Bersiap untuk Foto...
+                    </span>
+                </div>
+
+                <!-- Camera Simulator Fallback -->
+                <div id="camera-fallback" class="absolute inset-0 bg-zinc-100 flex flex-col items-center justify-center p-6 text-center z-10 hidden">
+                    <i data-lucide="camera-off" class="w-10 h-10 text-zinc-400 mb-2"></i>
+                    <h4 class="font-semibold text-zinc-900 text-sm mb-1">Webcam Tidak Terdeteksi</h4>
+                    <p class="text-xs text-zinc-500 max-w-sm mb-4">Gunakan kamera laptop/HP atau aktifkan Mode Simulator Studio untuk menguji alur aplikasi.</p>
+                    <button onclick="useSimulatedCamera()" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold shadow-xs transition">
+                        Aktifkan Kamera Simulator
+                    </button>
+                </div>
+            </div>
+
+            <!-- Shutter Control Bar -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 max-w-3xl mx-auto bg-white p-3.5 rounded-2xl border border-zinc-200 shadow-sm">
+                <div class="flex flex-wrap items-center justify-between sm:justify-start gap-3">
+                    <!-- Filter Selector -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-zinc-500 font-medium">Filter:</span>
+                        <select id="camera-filter-select" onchange="setFilter(this.value)" class="bg-zinc-50 border border-zinc-200 text-xs text-zinc-800 font-medium rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-zinc-900">
+                            <option value="none">Natural</option>
+                            <option value="soft">Soft Natural</option>
+                            <option value="bw">Vintage Mono</option>
+                            <option value="vintage">Warm Film</option>
+                            <option value="cool">Cool Slate</option>
+                        </select>
+                    </div>
+
+                    <div class="hidden sm:block h-5 w-px bg-zinc-200"></div>
+
+                    <!-- Timer Selector (Dipindahkan ke layar kamera sebelum mulai foto) -->
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xs text-zinc-500 font-medium flex items-center gap-1 mr-0.5">
+                            <i data-lucide="timer" class="w-3.5 h-3.5 text-zinc-600"></i> Timer:
+                        </span>
+                        <button type="button" onclick="setTimerSec(3, this)" class="timer-btn active px-2.5 py-1.5 text-xs rounded-lg border border-zinc-900 bg-zinc-900 text-white font-bold transition">3d</button>
+                        <button type="button" onclick="setTimerSec(5, this)" class="timer-btn px-2.5 py-1.5 text-xs rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-600 font-medium transition">5d</button>
+                        <button type="button" onclick="setTimerSec(10, this)" class="timer-btn px-2.5 py-1.5 text-xs rounded-lg border border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-600 font-medium transition">10d</button>
+                    </div>
+                </div>
+
+                <button id="start-shoot-btn" onclick="startPhotoSequence()" class="px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-display font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 transition active:scale-95">
+                    <i data-lucide="aperture" class="w-4 h-4"></i> MULAI SEKUENS FOTO
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= STEP 4: RESULT & DOWNLOAD ================= -->
+        <section id="screen-result" class="hidden space-y-6 animate-fade-in">
+            <div class="text-center max-w-lg mx-auto space-y-1">
+                <span class="text-xs font-mono font-semibold text-emerald-600 uppercase tracking-widest flex items-center justify-center gap-1">
+                    <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> STUDIO RENDER COMPLETE
+                </span>
+                <h2 class="text-2xl font-display font-bold text-zinc-900">Hasil Photo Strip Studio</h2>
+                <p class="text-xs text-zinc-500">Scan barcode untuk unduh langsung ke HP, simpan file PNG, atau cetak hasil fotomu.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start max-w-4xl mx-auto">
+                <!-- Rendered Canvas Box -->
+                <div class="lg:col-span-7 flex flex-col items-center justify-center">
+                    <div id="final-canvas-wrapper" class="p-3 bg-white border border-zinc-200 rounded-2xl shadow-lg max-w-full overflow-hidden">
+                        <canvas id="output-canvas" class="max-w-full h-auto rounded-lg shadow-xs border border-zinc-100"></canvas>
+                    </div>
+                </div>
+
+                <!-- Export Controls -->
+                <div class="lg:col-span-5 bg-white border border-zinc-200 p-5 rounded-2xl space-y-4 shadow-sm">
+                    <h3 class="font-semibold text-zinc-900 text-xs border-b border-zinc-100 pb-2.5 flex items-center gap-2 uppercase tracking-wider">
+                        <i data-lucide="download" class="w-4 h-4 text-zinc-500"></i> Simpan & Cetak
+                    </h3>
+
+                    <!-- Instant Mobile Barcode & QR Download Card -->
+                    <div class="bg-zinc-50 border border-zinc-200/90 rounded-xl p-3.5 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-semibold text-zinc-800 flex items-center gap-1.5">
+                                <i data-lucide="smartphone" class="w-3.5 h-3.5 text-zinc-700"></i>
+                                Scan Barcode ke HP
+                            </span>
+                            <span class="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 uppercase">
+                                Softcopy Ready
+                            </span>
+                        </div>
+
+                        <div class="flex items-center gap-3.5 bg-white p-2.5 rounded-lg border border-zinc-200/80 shadow-2xs">
+                            <!-- QR Code Container -->
+                            <div id="download-qrcode" class="shrink-0 bg-white p-1 rounded border border-zinc-100"></div>
+
+                            <!-- 1D Studio Barcode & Info -->
+                            <div class="flex-1 min-w-0 space-y-1.5">
+                                <p class="text-[11px] text-zinc-600 leading-snug">
+                                    Arahkan kamera HP ke barcode untuk langsung simpan foto.
+                                </p>
+                                <!-- Visual 1D Barcode Bars -->
+                                <div id="download-barcode-bars" class="h-6 flex items-stretch gap-[1.5px] opacity-85 overflow-hidden" aria-hidden="true"></div>
+                                <div class="flex items-center justify-between gap-1 pt-0.5">
+                                    <span id="download-session-code" class="text-[10px] font-mono font-bold text-zinc-800 tracking-wider">HRU-2026-0000</span>
+                                    <button type="button" onclick="copyDownloadLink()" class="text-[10px] font-medium text-zinc-600 hover:text-zinc-900 underline flex items-center gap-0.5">
+                                        <i data-lucide="copy" class="w-2.5 h-2.5"></i> Salin Link
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="downloadPhotoStrip()" class="w-full py-3 px-4 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 transition active:scale-95">
+                        <i data-lucide="download-cloud" class="w-4 h-4"></i> Unduh Foto High-Res (PNG)
+                    </button>
+
+                    <button onclick="printPhotoStrip()" class="w-full py-2.5 px-4 bg-zinc-100 hover:bg-zinc-200/80 text-zinc-800 font-semibold text-xs rounded-xl border border-zinc-200 flex items-center justify-center gap-2 transition">
+                        <i data-lucide="printer" class="w-4 h-4"></i> Cetak Foto (Printer Studio)
+                    </button>
+
+                    <div class="pt-3 border-t border-zinc-100 space-y-2">
+                        <button onclick="retakePhotos()" class="w-full py-2 px-3 bg-zinc-50 hover:bg-zinc-100 text-zinc-600 font-medium text-xs rounded-lg border border-zinc-200 flex items-center justify-center gap-2 transition">
+                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Foto Ulang Sesi Ini
+                        </button>
+                        <button onclick="resetApp()" class="w-full py-2 px-3 bg-zinc-50 hover:bg-zinc-100 text-zinc-600 font-medium text-xs rounded-lg border border-zinc-200 flex items-center justify-center gap-2 transition">
+                            <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Mulai Sesi Baru
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Minimal Footer -->
+    <footer class="border-t border-zinc-200/80 py-4 text-center text-[11px] text-zinc-400 mt-auto bg-white/50">
+        <p>© 2026 Haru Studio Photobooth System. All rights reserved.</p>
+    </footer>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-white border border-zinc-200 text-zinc-900 px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 transform translate-y-24 opacity-0 transition-all duration-300 z-50">
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600 shrink-0"></i>
+        <span id="toast-message" class="text-xs font-medium">Pesan Notifikasi</span>
+    </div>
+
+    <!-- MAIN LOGIC SCRIPT -->
+    <script>
+        // State Management
+        const state = {
+            currentStep: 1,
+            selectedPackage: { id: 'strip-4', price: 25000, name: 'Classic 4-Cut Strip', count: 4 },
+            paymentStatus: 'pending',
+            frameColor: '#ffffff', // Default Pure Bright White
+            frameText: 'HARU STUDIO • 2026',
+            photoFilter: 'none',
+            timerSeconds: 3,
+            capturedPhotos: [],
+            isMirror: true,
+            stream: null,
+            isShooting: false,
+            sessionCode: generateSessionCode()
+        };
+
+        function generateSessionCode() {
+            const rand = Math.floor(1000 + Math.random() * 9000);
+            return `HRU-2026-${rand}`;
+        }
+
+        const FRAME_COLORS = [
+            { name: 'Pure White', hex: '#ffffff' },
+            { name: 'Matte Black', hex: '#18181b' },
+            { name: 'Warm Cream', hex: '#faf6f0' },
+            { name: 'Soft Sage', hex: '#e6ede8' },
+            { name: 'Powder Blue', hex: '#e5eef7' },
+            { name: 'Muted Pink', hex: '#f7e6eb' },
+            { name: 'Butter Yellow', hex: '#fbf5d9' },
+            { name: 'Lilac Mist', hex: '#ede8f7' }
+        ];
+
+        const POSE_PROMPTS = [
+            '💡 Pose #1: Senyum manis & Peace Sign ✌️',
+            '💡 Pose #2: Gaya candid ketawa bareng 😄',
+            '💡 Pose #3: Tatap kamera gaya cool model 😎',
+            '💡 Pose #4: Bikin bentuk hati pakai tangan 🫶',
+            '💡 Pose #5: Ekspresi bebas paling gokil 🤪',
+            '💡 Pose #6: Pose penutup paling kece ✨'
+        ];
+
+        function initColorSwatches() {
+            const container = document.getElementById('color-picker-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            FRAME_COLORS.forEach((color) => {
+                const isSelected = state.frameColor.toLowerCase() === color.hex.toLowerCase();
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.title = color.name;
+                btn.className = `color-swatch h-9 rounded-xl border transition flex items-center justify-center px-2 text-[10px] font-medium ${
+                    isSelected
+                        ? 'border-zinc-900 ring-2 ring-zinc-900/20 font-semibold'
+                        : 'border-zinc-200 hover:border-zinc-400'
+                }`;
+                btn.style.backgroundColor = color.hex;
+                btn.style.color = isColorLight(color.hex) ? '#18181b' : '#ffffff';
+                btn.innerText = color.name.split(' ')[1] || color.name;
+
+                btn.onclick = () => {
+                    state.frameColor = color.hex;
+                    initColorSwatches();
+                    updateFramePreview();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initColorSwatches();
+            lucide.createIcons();
+        });
+
+        // Package Selection & QRIS Trigger
+        function selectPackage(pkgId, price, name, photoCount) {
+            state.selectedPackage = { id: pkgId, price: price, name: name, count: photoCount };
+            
+            document.getElementById('selected-pkg-name').innerText = name;
+            document.getElementById('selected-pkg-price').innerText = `Rp ${price.toLocaleString('id-ID')}`;
+            document.getElementById('qris-modal').classList.remove('hidden');
+
+            const qrContainer = document.getElementById('qrcode-canvas');
+            qrContainer.innerHTML = '';
+            const payload = `00020101021226680016ID.CO.QRIS.WWW01189360091438293819280215ID10203948293815303360540${price}5802ID5908HARUSTUDIO6007JAKARTA6304ABCD`;
+            
+            new QRCode(qrContainer, {
+                text: payload,
+                width: 160,
+                height: 160,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            startPaymentTimer();
+        }
+
+        function closeQrisModal() {
+            document.getElementById('qris-modal').classList.add('hidden');
+        }
+
+        let paymentTimerInterval;
+        function startPaymentTimer() {
+            let totalSeconds = 300;
+            const timerEl = document.getElementById('payment-timer');
+            clearInterval(paymentTimerInterval);
+            
+            paymentTimerInterval = setInterval(() => {
+                const mins = Math.floor(totalSeconds / 60);
+                const secs = totalSeconds % 60;
+                timerEl.innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                if (totalSeconds <= 0) {
+                    clearInterval(paymentTimerInterval);
+                    closeQrisModal();
+                    showToast('Waktu pembayaran QRIS telah berakhir.');
+                }
+                totalSeconds--;
+            }, 1000);
+        }
+
+        function simulatePaymentSuccess() {
+            clearInterval(paymentTimerInterval);
+            closeQrisModal();
+            state.paymentStatus = 'paid';
+            
+            confetti({
+                particleCount: 80,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+
+            showToast('Pembayaran QRIS Berhasil! Menyiapkan Frame Studio...');
+            
+            setTimeout(() => {
+                switchStep(2);
+            }, 800);
+        }
+
+        // Navigation Steps Switcher
+        function switchStep(stepNum) {
+            state.currentStep = stepNum;
+            
+            document.getElementById('screen-payment').classList.add('hidden');
+            document.getElementById('screen-frame').classList.add('hidden');
+            document.getElementById('screen-camera').classList.add('hidden');
+            document.getElementById('screen-result').classList.add('hidden');
+
+            for (let i = 1; i <= 4; i++) {
+                const btn = document.getElementById(`step-btn-${i}`);
+                if (i === stepNum) {
+                    btn.className = 'flex items-center gap-2 text-zinc-900 font-semibold';
+                    btn.querySelector('span:first-child').className = 'w-5 h-5 rounded-full bg-zinc-900 text-white flex items-center justify-center text-[10px] font-bold';
+                } else {
+                    btn.className = 'flex items-center gap-2 text-zinc-400 font-medium';
+                    btn.querySelector('span:first-child').className = 'w-5 h-5 rounded-full bg-zinc-200/80 text-zinc-500 flex items-center justify-center text-[10px] font-bold';
+                }
+            }
+
+            if (stepNum === 1) {
+                document.getElementById('screen-payment').classList.remove('hidden');
+            } else if (stepNum === 2) {
+                document.getElementById('screen-frame').classList.remove('hidden');
+                updateFramePreview();
+            } else if (stepNum === 3) {
+                document.getElementById('screen-camera').classList.remove('hidden');
+                initWebcam();
+            } else if (stepNum === 4) {
+                document.getElementById('screen-result').classList.remove('hidden');
+                renderFinalPhotoCanvas();
+            }
+        }
+
+        // STEP 2: Customization Logic
+        function updateFramePreview() {
+            const mockupFrame = document.getElementById('mockup-frame');
+            const slotsContainer = document.getElementById('mockup-slots-container');
+            const footerDivider = document.getElementById('mockup-footer-divider');
+            const footerText = document.getElementById('mockup-footer-text');
+            const subtitleText = document.getElementById('mockup-subtitle-text');
+            const userText = document.getElementById('frame-text-input').value;
+
+            mockupFrame.style.backgroundColor = state.frameColor;
+            
+            const isLightBg = isColorLight(state.frameColor);
+            footerDivider.style.borderColor = isLightBg ? '#e4e4e7' : '#27272a';
+            footerText.style.color = isLightBg ? '#18181b' : '#f4f4f5';
+            subtitleText.style.color = isLightBg ? '#71717a' : '#a1a1aa';
+            footerText.innerText = userText || 'HARU STUDIO • 2026';
+
+            slotsContainer.innerHTML = '';
+
+            const count = state.selectedPackage.count;
+            if (state.selectedPackage.id === 'grid-4') {
+                slotsContainer.className = 'grid grid-cols-2 gap-2';
+            } else {
+                slotsContainer.className = 'space-y-2';
+            }
+
+            for (let i = 0; i < count; i++) {
+                const slot = document.createElement('div');
+                slot.className = isLightBg
+                    ? 'aspect-[4/3] bg-zinc-100 rounded flex flex-col items-center justify-center border border-zinc-200/80 text-zinc-400 text-[10px] font-mono'
+                    : 'aspect-[4/3] bg-zinc-900 rounded flex flex-col items-center justify-center border border-zinc-800 text-zinc-500 text-[10px] font-mono';
+                slot.innerHTML = `<i data-lucide="camera" class="w-3.5 h-3.5 mb-1 opacity-60"></i><span>Slot #${i + 1}</span>`;
+                slotsContainer.appendChild(slot);
+            }
+            lucide.createIcons();
+        }
+
+        function setFilter(filterName, el = null) {
+            state.photoFilter = filterName;
+            
+            // Highlight active filter button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('border-zinc-900', 'bg-zinc-900', 'text-white', 'font-semibold');
+                btn.classList.add('border-zinc-200', 'bg-zinc-50', 'text-zinc-600', 'font-medium');
+            });
+
+            let activeBtn = el;
+            if (!activeBtn) {
+                activeBtn = Array.from(document.querySelectorAll('.filter-btn')).find(b => b.getAttribute('onclick')?.includes(`'${filterName}'`));
+            }
+            if (activeBtn) {
+                activeBtn.classList.remove('border-zinc-200', 'bg-zinc-50', 'text-zinc-600', 'font-medium');
+                activeBtn.classList.add('border-zinc-900', 'bg-zinc-900', 'text-white', 'font-semibold');
+            }
+
+            // Sync with select option on camera screen
+            const cameraSelect = document.getElementById('camera-filter-select');
+            if (cameraSelect) cameraSelect.value = filterName;
+
+            const video = document.getElementById('webcam-video');
+            let filterCss = 'none';
+            if (filterName === 'bw') filterCss = 'grayscale(100%) contrast(115%)';
+            if (filterName === 'vintage') filterCss = 'sepia(35%) contrast(105%) brightness(95%)';
+            if (filterName === 'cool') filterCss = 'hue-rotate(180deg) contrast(105%)';
+            if (filterName === 'soft') filterCss = 'brightness(106%) contrast(98%)';
+
+            if (video) video.style.filter = filterCss;
+        }
+
+        function setTimerSec(sec, el = null) {
+            state.timerSeconds = sec;
+            
+            // Highlight active timer button
+            document.querySelectorAll('.timer-btn').forEach(b => {
+                b.classList.remove('border-zinc-900', 'bg-zinc-900', 'text-white', 'font-bold');
+                b.classList.add('border-zinc-200', 'bg-zinc-50', 'text-zinc-600', 'font-medium');
+            });
+
+            let activeBtn = el;
+            if (!activeBtn) {
+                activeBtn = Array.from(document.querySelectorAll('.timer-btn')).find(b => b.getAttribute('onclick')?.includes(`(${sec}`));
+            }
+            if (activeBtn) {
+                activeBtn.classList.remove('border-zinc-200', 'bg-zinc-50', 'text-zinc-600', 'font-medium');
+                activeBtn.classList.add('border-zinc-900', 'bg-zinc-900', 'text-white', 'font-bold');
+            }
+        }
+
+        function goToCameraScreen() {
+            switchStep(3);
+        }
+
+        // STEP 3: Camera Logic
+        async function initWebcam() {
+            const video = document.getElementById('webcam-video');
+            const fallback = document.getElementById('camera-fallback');
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: { ideal: 1280 }, height: { ideal: 960 } },
+                    audio: false
+                });
+                state.stream = stream;
+                video.srcObject = stream;
+                fallback.classList.add('hidden');
+            } catch (err) {
+                console.warn('Camera error:', err);
+                fallback.classList.remove('hidden');
+            }
+        }
+
+        function toggleMirror() {
+            state.isMirror = !state.isMirror;
+            const video = document.getElementById('webcam-video');
+            video.style.transform = state.isMirror ? 'scaleX(-1)' : 'scaleX(1)';
+        }
+
+        function useSimulatedCamera() {
+            document.getElementById('camera-fallback').classList.add('hidden');
+            const video = document.getElementById('webcam-video');
+            video.style.display = 'none';
+
+            const simCanvas = document.createElement('canvas');
+            simCanvas.id = 'simulated-video-canvas';
+            simCanvas.className = 'w-full h-full object-cover';
+            simCanvas.width = 640;
+            simCanvas.height = 480;
+            video.parentNode.appendChild(simCanvas);
+
+            const ctx = simCanvas.getContext('2d');
+            function drawSim() {
+                ctx.fillStyle = '#f4f4f5';
+                ctx.fillRect(0,0,640,480);
+                
+                // Bright Studio Minimal Mascot Illustration
+                ctx.fillStyle = '#18181b';
+                ctx.beginPath();
+                ctx.arc(320, 230, 95, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(285, 210, 10, 0, Math.PI * 2);
+                ctx.arc(355, 210, 10, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(320, 250, 28, 0, Math.PI);
+                ctx.lineWidth = 5;
+                ctx.strokeStyle = '#ffffff';
+                ctx.stroke();
+
+                requestAnimationFrame(drawSim);
+            }
+            drawSim();
+        }
+
+        async function startPhotoSequence() {
+            if (state.isShooting) return;
+            state.isShooting = true;
+            state.capturedPhotos = [];
+
+            const startBtn = document.getElementById('start-shoot-btn');
+            startBtn.disabled = true;
+            startBtn.classList.add('opacity-50');
+
+            const totalShots = state.selectedPackage.count;
+            for (let i = 0; i < totalShots; i++) {
+                document.getElementById('shooting-counter').innerText = `${i + 1}/${totalShots}`;
+                document.getElementById('pose-prompt').innerText = POSE_PROMPTS[i % POSE_PROMPTS.length];
+                
+                await runCountdown(state.timerSeconds);
+                triggerFlash();
+                captureSinglePhoto();
+                await new Promise(r => setTimeout(r, 800));
+            }
+
+            state.isShooting = false;
+            startBtn.disabled = false;
+            startBtn.classList.remove('opacity-50');
+
+            if (state.stream) {
+                state.stream.getTracks().forEach(track => track.stop());
+            }
+
+            state.sessionCode = generateSessionCode();
+            showToast('Sesi foto selesai! Menyiapkan frame studio...');
+            setTimeout(() => {
+                switchStep(4);
+            }, 600);
+        }
+
+        function runCountdown(seconds) {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById('countdown-overlay');
+                const numEl = document.getElementById('countdown-number');
+                overlay.classList.remove('hidden');
+
+                let current = seconds;
+                numEl.innerText = current;
+
+                const timer = setInterval(() => {
+                    current--;
+                    if (current > 0) {
+                        numEl.innerText = current;
+                    } else {
+                        clearInterval(timer);
+                        overlay.classList.add('hidden');
+                        resolve();
+                    }
+                }, 1000);
+            });
+        }
+
+        function triggerFlash() {
+            const flash = document.getElementById('flash-overlay');
+            flash.classList.add('flash-animation');
+            setTimeout(() => flash.classList.remove('flash-animation'), 500);
+        }
+
+        function captureSinglePhoto() {
+            const video = document.getElementById('webcam-video');
+            const simCanvas = document.getElementById('simulated-video-canvas');
+            const canvas = document.getElementById('capture-canvas');
+            const ctx = canvas.getContext('2d');
+
+            const width = 800;
+            const height = 600;
+            canvas.width = width;
+            canvas.height = height;
+
+            ctx.save();
+            if (state.isMirror) {
+                ctx.translate(width, 0);
+                ctx.scale(-1, 1);
+            }
+
+            if (state.photoFilter === 'bw') ctx.filter = 'grayscale(100%) contrast(115%)';
+            if (state.photoFilter === 'vintage') ctx.filter = 'sepia(35%) contrast(105%)';
+            if (state.photoFilter === 'cool') ctx.filter = 'hue-rotate(180deg) contrast(105%)';
+            if (state.photoFilter === 'soft') ctx.filter = 'brightness(106%)';
+
+            if (video && video.style.display !== 'none' && video.readyState === 4) {
+                ctx.drawImage(video, 0, 0, width, height);
+            } else if (simCanvas) {
+                ctx.drawImage(simCanvas, 0, 0, width, height);
+            } else {
+                ctx.fillStyle = '#27272a';
+                ctx.fillRect(0,0,width,height);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 28px sans-serif';
+                ctx.fillText(`Snap Pose #${state.capturedPhotos.length + 1}`, 280, 300);
+            }
+
+            ctx.restore();
+            state.capturedPhotos.push(canvas.toDataURL('image/jpeg', 0.95));
+        }
+
+        // STEP 4: Render High-Res Canvas
+        function renderFinalPhotoCanvas() {
+            const canvas = document.getElementById('output-canvas');
+            const ctx = canvas.getContext('2d');
+
+            const isGrid = state.selectedPackage.id === 'grid-4';
+            const count = state.selectedPackage.count;
+
+            const photoW = 600;
+            const photoH = 450;
+            const padding = 40;
+            const gap = 24;
+
+            let canvasW, canvasH;
+
+            if (isGrid) {
+                canvasW = (photoW * 2) + (padding * 2) + gap;
+                canvasH = (photoH * 2) + (padding * 2) + gap + 130;
+            } else {
+                canvasW = photoW + (padding * 2);
+                canvasH = (photoH * count) + (padding * 2) + (gap * (count - 1)) + 140;
+            }
+
+            canvas.width = canvasW;
+            canvas.height = canvasH;
+
+            // Background Frame Fill
+            ctx.fillStyle = state.frameColor;
+            ctx.fillRect(0, 0, canvasW, canvasH);
+
+            let loadedCount = 0;
+            state.capturedPhotos.forEach((src, idx) => {
+                const img = new Image();
+                img.onload = () => {
+                    let x, y;
+                    if (isGrid) {
+                        const col = idx % 2;
+                        const row = Math.floor(idx / 2);
+                        x = padding + col * (photoW + gap);
+                        y = padding + row * (photoH + gap);
+                    } else {
+                        x = padding;
+                        y = padding + idx * (photoH + gap);
+                    }
+
+                    // Draw Photo
+                    ctx.save();
+                    ctx.shadowColor = 'rgba(0,0,0,0.15)';
+                    ctx.shadowBlur = 8;
+                    ctx.drawImage(img, x, y, photoW, photoH);
+                    ctx.restore();
+
+                    loadedCount++;
+                    if (loadedCount === state.capturedPhotos.length) {
+                        const isLight = isColorLight(state.frameColor);
+                        
+                        // Header / Footer Main Text
+                        ctx.fillStyle = isLight ? '#09090b' : '#ffffff';
+                        ctx.textAlign = 'center';
+                        
+                        ctx.font = '600 28px "Inter", sans-serif';
+                        ctx.fillText(document.getElementById('frame-text-input').value, canvasW / 2, canvasH - 70);
+
+                        // Date & Subtitle Stamp
+                        const dateStr = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+                        ctx.font = '500 16px "Inter", monospace';
+                        ctx.fillStyle = isLight ? '#52525b' : '#a1a1aa';
+                        ctx.fillText(`★ HARU PHOTO STUDIO • ${dateStr} ★`, canvasW / 2, canvasH - 40);
+
+                        // Generate Barcode & QR Code for Instant Phone Download
+                        generateDownloadBarcode();
+                    }
+                };
+                img.src = src;
+            });
+        }
+
+        // Generate Scannable QR Code & 1D Barcode for Smartphone Download
+        function getDownloadShareUrl() {
+            const baseUrl = window.location.href.startsWith('http')
+                ? `${window.location.origin}${window.location.pathname}`
+                : 'https://haru-studio.booth/download';
+            return `${baseUrl}?session=${encodeURIComponent(state.sessionCode)}&dl=1`;
+        }
+
+        function generateDownloadBarcode() {
+            const qrContainer = document.getElementById('download-qrcode');
+            const codeLabel = document.getElementById('download-session-code');
+            const barsContainer = document.getElementById('download-barcode-bars');
+
+            if (!qrContainer) return;
+
+            codeLabel.innerText = state.sessionCode;
+            qrContainer.innerHTML = '';
+
+            const downloadUrl = getDownloadShareUrl();
+            new QRCode(qrContainer, {
+                text: downloadUrl,
+                width: 84,
+                height: 84,
+                colorDark: "#18181b",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+
+            // Render decorative 1D studio barcode pattern tied to sessionCode
+            if (barsContainer) {
+                barsContainer.innerHTML = '';
+                const seedStr = state.sessionCode + 'HARUSTUDIO';
+                for (let i = 0; i < 34; i++) {
+                    const bar = document.createElement('span');
+                    const charCode = seedStr.charCodeAt(i % seedStr.length);
+                    const widthClass = (charCode + i) % 3 === 0 ? 'w-[3px]' : ((charCode + i) % 2 === 0 ? 'w-[2px]' : 'w-[1px]');
+                    bar.className = `${widthClass} bg-zinc-900 rounded-[0.5px]`;
+                    barsContainer.appendChild(bar);
+                }
+            }
+            lucide.createIcons();
+        }
+
+        function copyDownloadLink() {
+            const url = getDownloadShareUrl();
+            const tempInput = document.createElement('input');
+            tempInput.value = url;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast('Link download softcopy berhasil disalin!');
+        }
+
+        // Helpers
+        function isColorLight(colorHex) {
+            if (!colorHex || colorHex.startsWith('rgb')) return false;
+            const hex = colorHex.replace('#', '');
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            return brightness > 155;
+        }
+
+        function downloadPhotoStrip() {
+            const canvas = document.getElementById('output-canvas');
+            const link = document.createElement('a');
+            link.download = `HaruStudio-Photo-${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            showToast('Foto berhasil diunduh!');
+        }
+
+        function printPhotoStrip() {
+            const canvas = document.getElementById('output-canvas');
+            const dataUrl = canvas.toDataURL();
+            const printWin = window.open('', '', 'width=800,height=1000');
+            printWin.document.write(`<img src="${dataUrl}" style="width:100%; height:auto;" onload="window.print(); window.close();"/>`);
+            printWin.document.close();
+        }
+
+        function retakePhotos() {
+            switchStep(3);
+        }
+
+        function resetApp() {
+            if (state.stream) {
+                state.stream.getTracks().forEach(track => track.stop());
+            }
+            state.capturedPhotos = [];
+            state.paymentStatus = 'pending';
+            state.sessionCode = generateSessionCode();
+            switchStep(1);
+            showToast('Sesi photobooth telah di-reset.');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
